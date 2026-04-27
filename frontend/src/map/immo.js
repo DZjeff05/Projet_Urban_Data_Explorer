@@ -223,12 +223,22 @@ document.querySelectorAll(".tab").forEach(btn => {
     btn.classList.add("active");
 
     const tab = btn.dataset.tab;
+    activeTab = tab;
     document.getElementById(`tab-${tab}`).classList.remove("hidden");
 
     if (tab === "immo") {
       showChoropleth();
     } else {
       hideChoropleth();
+    }
+
+    // Masquer marker/cercle si on revient sur immo (pas de clic-sur-carte)
+    if (tab === "immo" && currentMarker) {
+      currentMarker.remove();
+      currentMarker = null;
+      if (map.getSource("radius-circle")) {
+        map.getSource("radius-circle").setData({ type: "Feature", geometry: { type: "Polygon", coordinates: [[]] } });
+      }
     }
   });
 });

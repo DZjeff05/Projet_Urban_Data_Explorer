@@ -27,6 +27,9 @@ let currentMarker = null;
 let currentCircle = null;
 let currentRadius = 500;
 
+// Onglet actif — mis à jour par immo.js lors des changements d'onglet
+let activeTab = "immo";
+
 // ── UI refs ────────────────────────────────────────────────────────────────
 
 const radiusInput  = document.getElementById("radius");
@@ -64,10 +67,14 @@ radiusInput.addEventListener("input", () => {
 // ── Clic carte ─────────────────────────────────────────────────────────────
 
 map.on("click", (e) => {
+  if (activeTab === "immo") return;
+
   const { lng, lat } = e.lngLat;
   placeMarker(lat, lng);
   updateCircle(lat, lng, currentRadius);
-  fetchScore(lat, lng, currentRadius);
+
+  if (activeTab === "culture") fetchScore(lat, lng, currentRadius);
+  else if (activeTab === "velib") fetchVelib(lat, lng, currentRadius);
 });
 
 // ── Marker ─────────────────────────────────────────────────────────────────
@@ -220,8 +227,8 @@ function hideLayer(cat) {
 
 // Aucune couche chargée par défaut
 
-// Toggle boutons
-document.querySelectorAll(".layer-btn").forEach((btn) => {
+// Toggle boutons (uniquement onglet culture)
+document.querySelectorAll("#tab-culture .layer-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     const cat = btn.dataset.cat;
     const isActive = btn.classList.toggle("active");
